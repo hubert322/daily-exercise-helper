@@ -34,7 +34,7 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <div className={styles.description}>
-          <p>Your New Year's Resolution</p>
+          <p>Your New Year&apos;s Resolution</p>
           <div>By Hubert Hung</div>
         </div>
         <div className={styles.center}>
