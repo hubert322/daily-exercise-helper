@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
 import Head from 'next/head'
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
@@ -63,7 +63,11 @@ function Exercise({ name, time }: ExerciseInterface) {
   )
 }
 
-function Timer({ time }) {
+interface TimerProps {
+  time: string
+}
+
+function Timer({ time }: TimerProps) {
   const [hasStarted, setHasStarted] = useState(false)
 
   const {
@@ -85,7 +89,7 @@ function Timer({ time }) {
     onRestart()
   }
 
-  function getExpiryTimestamp(time) {
+  function getExpiryTimestamp(time: string) {
     const expiryTimestamp = new Date()
     const [minutes, seconds] = time.split(":")
     expiryTimestamp.setMinutes(expiryTimestamp.getMinutes() + Number(minutes))
@@ -98,8 +102,8 @@ function Timer({ time }) {
     restart(getExpiryTimestamp(time), false)
   }
 
-  function getTimeLeft(minutes, seconds) {
-    const minutesStr = minutes.toLocaleString("en-US", {minimumIntegerDigits: 2, useGrouping: false})
+  function getTimeLeft(minutes: number, seconds: number) {
+    const minutesStr = minutes.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })
     const secondsStr = seconds.toLocaleString("en-US", { minimumIntegerDigits: 2, useGrouping: false })
     return minutesStr + ":" + secondsStr
   }
@@ -111,7 +115,17 @@ function Timer({ time }) {
   )
 }
 
-function TimerButton({ hasStarted, setHasStarted, isRunning, start, pause, resume, onRestart }) {
+interface TimerButtonProps {
+  hasStarted: boolean
+  setHasStarted: Dispatch<SetStateAction<boolean>>
+  isRunning: boolean
+  start: () => void
+  pause: () => void
+  resume: () => void
+  onRestart: () => void
+}
+
+function TimerButton({ hasStarted, setHasStarted, isRunning, start, pause, resume, onRestart }: TimerButtonProps) {
 
   function onStart() {
     setHasStarted(true)
