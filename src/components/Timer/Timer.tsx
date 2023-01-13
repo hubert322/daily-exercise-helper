@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTimer } from 'react-timer-hook'
 import { Inter } from '@next/font/google'
 import TimerButton from '../TimerButton/TimerButton'
+import styles from './Timer.module.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -51,8 +52,9 @@ export default function Timer({ time }: TimerProps) {
   }
 
   return (
-    <p className={inter.className}>
-      <TimerButton hasStarted={hasStarted} setHasStarted={setHasStarted} isRunning={isRunning} start={start} pause={pause} resume={resume} onRestart={onRestart} /> {getTimeLeft(minutes, seconds)}
-    </p>
+    <div className={styles.timerContainer}>
+      <TimerButton hasStarted={hasStarted} setHasStarted={setHasStarted} isRunning={isRunning} start={start} pause={pause} resume={resume} onRestart={onRestart} size="1.5rem" />
+      <p className={inter.className}>{getTimeLeft(minutes, seconds)}</p>
+    </div>
   )
 }

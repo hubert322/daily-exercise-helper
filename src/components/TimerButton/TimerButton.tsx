@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction } from "react"
 import styles from './TimerButton.module.css'
+import { VscDebugStart, VscDebugPause, VscDebugContinue, VscDebugRestart } from 'react-icons/vsc'
+import { IconContext } from 'react-icons'
 
 interface TimerButtonProps {
   hasStarted: boolean
@@ -9,9 +11,10 @@ interface TimerButtonProps {
   pause: () => void
   resume: () => void
   onRestart: () => void
+  size?: string
 }
 
-export default function TimerButton({ hasStarted, setHasStarted, isRunning, start, pause, resume, onRestart }: TimerButtonProps) {
+export default function TimerButton({ hasStarted, setHasStarted, isRunning, start, pause, resume, onRestart, size }: TimerButtonProps) {
 
   function onStart() {
     setHasStarted(true)
@@ -20,18 +23,34 @@ export default function TimerButton({ hasStarted, setHasStarted, isRunning, star
 
   if (!hasStarted) {
     return (
-      <button className={styles.timerButton} onClick={onStart}>&gt;</button>
+      <IconContext.Provider value={{ size: size }}>
+        <button className={styles.timerButton} onClick={onStart}>
+          <VscDebugStart />
+        </button>
+      </IconContext.Provider>
     )
   }
   if (isRunning) {
     return (
-      <button className={styles.timerButton} onClick={pause}>||</button>
+      <IconContext.Provider value={{ size: size }}>
+        <button className={styles.timerButton} onClick={pause}>
+          <VscDebugPause />
+        </button>
+      </IconContext.Provider>
     )
   }
   return (
     <>
-      <button className={styles.timerButton} onClick={resume}>&gt;</button>
-      <button className={styles.timerButton} onClick={onRestart}>Restart</button>
+      <IconContext.Provider value={{ size: size }}>
+        <button className={styles.timerButton} onClick={resume}>
+          <VscDebugContinue />
+        </button>
+      </IconContext.Provider>
+      <IconContext.Provider value={{ size: size }}>
+        <button className={styles.timerButton} onClick={onRestart}>
+          <VscDebugRestart />
+        </button>
+      </IconContext.Provider>
     </>
   )
 }

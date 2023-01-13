@@ -1,0 +1,14 @@
+.timerContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  column-gap: 1ch;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .timerContainer {
+    justify-content: center;
+  }
+}
