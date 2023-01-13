@@ -1,22 +1,9 @@
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
-import Exercise from '../components/Exercise/Exercise'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function Home() {
-
-  const exercises = [
-    {
-      name: "Drunk Spiderwalk",
-      time: "5:00",
-    },
-    {
-      name: "Vocal Warmups",
-      time: "00:05"
-    },
-  ]
-
+export default function Fallback() {
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -27,9 +14,7 @@ export default function Home() {
         <h1 className={inter.className}>Daily Exercise Helper</h1>
       </div>
       <div className={styles.grid}>
-        {exercises.map((exercise, i) => (
-          <Exercise {...exercise} key={`exercise-${i}`} />
-        ))}
+        <p>You&pos;re currently offline</p>
       </div>
     </main>
   )
