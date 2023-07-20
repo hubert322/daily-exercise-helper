@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction } from 'react'
 import styles from './TimerButton.module.css'
 import { VscDebugStart, VscDebugPause, VscDebugContinue, VscDebugRestart } from 'react-icons/vsc'
 import { IconContext } from 'react-icons'
@@ -11,7 +11,7 @@ interface TimerButtonProps {
   pause: () => void
   resume: () => void
   onRestart: () => void
-  size?: string
+  size: string
 }
 
 export default function TimerButton({ hasStarted, setHasStarted, isRunning, start, pause, resume, onRestart, size }: TimerButtonProps) {

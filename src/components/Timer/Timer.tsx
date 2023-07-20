@@ -8,9 +8,10 @@ const inter = Inter({ subsets: ['latin'] })
 
 interface TimerProps {
   time: string
+  notifyOnExpire: () => void
 }
 
-export default function Timer({ time }: TimerProps) {
+export default function Timer({ time, notifyOnExpire }: TimerProps) {
   const [hasStarted, setHasStarted] = useState(false)
 
   const {
@@ -28,7 +29,7 @@ export default function Timer({ time }: TimerProps) {
   })
 
   function onExpire() {
-    alert("Time is up!")
+    notifyOnExpire()
     onRestart()
   }
 

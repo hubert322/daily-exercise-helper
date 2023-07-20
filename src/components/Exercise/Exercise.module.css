@@ -24,6 +24,23 @@
   max-width: 30ch;
 }
 
+.cardTitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  column-gap: 1ch;
+  margin-bottom: 0.5rem;
+}
+
+.cardTitle h2 {
+  margin-bottom: 0.2rem;
+}
+
+.crossOut {
+  text-decoration: line-through;
+}
+
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
