@@ -83,7 +83,8 @@ export default function Home() {
 
   async function onAddExercise(exercise: ExerciseObj) {
     try {
-      await addDoc(collection(db, "exercises"), exercise);
+      const docRef = await addDoc(collection(db, "exercises"), exercise);
+      exercise.id = docRef.id
       setExercises([...exercises, exercise])
       openSnackbar("Added exercise " + exercise.name)
     } catch (e) {
