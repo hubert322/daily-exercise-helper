@@ -78,7 +78,7 @@
   align-items: center;
   position: relative;
   padding: 4rem 0;
-  z-index: 100;
+  z-index: -1;
 }
 
 .center::before {
@@ -93,7 +93,6 @@
   background: var(--primary-glow);
   width: 240px;
   height: 180px;
-  z-index: -1;
 }
 
 .center::before,

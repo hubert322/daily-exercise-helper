@@ -33,6 +33,10 @@
   margin-bottom: 0.5rem;
 }
 
+.cardTitle *:nth-last-child(2) {
+  margin-left: auto;
+}
+
 .cardTitle h2 {
   margin-bottom: 0.2rem;
 }
