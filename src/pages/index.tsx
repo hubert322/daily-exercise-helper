@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import { MdAddBox } from 'react-icons/md'
@@ -7,7 +7,7 @@ import Exercise, { ExerciseObj } from '../components/Exercise/Exercise'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
-import { addDoc, collection, doc, deleteDoc, getDocs, getFirestore } from 'firebase/firestore'
+import { addDoc, collection, doc, deleteDoc, getDocs, getFirestore, setDoc } from 'firebase/firestore'
 import ExerciseModal from '../components/ExerciseModal/ExerciseModal'
 import CustomSnackbar from '../components/CusomSnackbar/CustomSnackbar'
 
@@ -40,10 +40,16 @@ export default function Home() {
   }
 
   const [exercises, setExercises] = useState<ExerciseObj[]>([])
-  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false)
+
+  // snackbar
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState("")
+
+  // modal
+  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false)
+  const [modalTitle, setModalTitle] = useState("Add Exercise")
   const [modalCurrentExercise, setModalCurrentExercise] = useState(NEW_EXERCISE)
+  const modalOnSave = useRef <(exercise: ExerciseObj) => Promise<void>>(onAddExercise)
 
   useEffect(() => {
     (async () => {
@@ -81,6 +87,13 @@ export default function Home() {
     setIsSnackbarOpen(false)
   }
 
+  function onAddButton() {
+    setModalTitle("Add Exercise")
+    setModalCurrentExercise(NEW_EXERCISE)
+    modalOnSave.current = onAddExercise
+    setIsExerciseModalOpen(true)
+  }
+
   async function onAddExercise(exercise: ExerciseObj) {
     try {
       const docRef = await addDoc(collection(db, "exercises"), exercise);
@@ -92,8 +105,30 @@ export default function Home() {
     }
   }
 
-  async function onEditExercise(exercise: ExerciseObj) {
-    openSnackbar("Editing exercise not implemented yet")
+  function onEditExercise(exercise: ExerciseObj) {
+    setModalTitle("Edit Exercise")
+    setModalCurrentExercise(exercise)
+    modalOnSave.current = onModalEditExerciseSave
+    setIsExerciseModalOpen(true)
+  }
+
+  async function onModalEditExerciseSave(exercise: ExerciseObj) {
+    if (exercise.id) {
+      try {
+        const { id, ...exerciseWithoutId } = exercise
+        await setDoc(doc(db, "exercises", exercise.id), exerciseWithoutId)
+
+        const updatedExercises = [...exercises]
+        const exerciseIndex = updatedExercises.findIndex((ex, i, arr) => ex.id == exercise.id)
+        updatedExercises[exerciseIndex] = exercise
+        setExercises(updatedExercises)
+        openSnackbar("Updated exercise " + exercise.name)
+      } catch (e) {
+        openSnackbar("Error updating exercise: " + e)
+      }
+    } else {
+      openSnackbar(`Failed to edit exercise ${exercise.name}: id is undefined`)
+    }
   }
 
   async function onDeleteExercise(exercise: ExerciseObj) {
@@ -130,17 +165,17 @@ export default function Home() {
             />
           ))}
           <IconContext.Provider value={{ size: "3rem" }}>
-            <button onClick={() => setIsExerciseModalOpen(true)}>
+            <button onClick={onAddButton}>
               <MdAddBox />
             </button>
           </IconContext.Provider>
-          <button onClick={() => setIsSnackbarOpen(true)}>Open Snackbar</button>
         </div>
         <ExerciseModal
+          modalTitle={modalTitle}
           isExerciseModalOpen={isExerciseModalOpen}
           setIsExerciseModalOpen={setIsExerciseModalOpen}
           modalCurrentExercise={modalCurrentExercise}
-          onSave={onAddExercise}
+          onSave={modalOnSave}
         />
         <CustomSnackbar
           isSnackbarOpen={isSnackbarOpen}

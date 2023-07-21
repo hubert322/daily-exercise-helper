@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, MutableRefObject, SetStateAction, useEffect, useState } from 'react'
 import styles from './ExerciseModal.module.css'
 import { ExerciseObj } from '../Exercise/Exercise'
 import Button from '@mui/material/Button'
@@ -9,13 +9,15 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 
 interface ExerciseModalProps {
+  modalTitle: string
   isExerciseModalOpen: boolean
   setIsExerciseModalOpen: Dispatch<SetStateAction<boolean>>
   modalCurrentExercise: ExerciseObj
-  onSave: (exercise: ExerciseObj) => void
+  onSave: MutableRefObject<(exercise: ExerciseObj) => Promise<void>>
 }
 
 export default function ExerciseModal({
+  modalTitle,
   isExerciseModalOpen,
   setIsExerciseModalOpen,
   modalCurrentExercise,
@@ -23,6 +25,7 @@ export default function ExerciseModal({
 }: ExerciseModalProps) {
   const DEFAULT_NAME_IS_EMPTY = undefined
 
+  const [id, setId] = useState<string | undefined>(undefined)
   const [name, setName] = useState<string>("")
   const [nameIsEmpty, setNameIsEmpty] = useState<boolean | undefined>(DEFAULT_NAME_IS_EMPTY)
   const [category, setCategory] = useState<string>("")
@@ -51,27 +54,31 @@ export default function ExerciseModal({
         category: category,
         frequency: frequency,
       }
+      if (id) {
+        exercise.id = id
+      }
       if (time) {
         exercise.time = time
       }
-      onSave(exercise)
+      onSave.current(exercise)
       onClose()
     }
   }
 
   useEffect(() => {
     if (isExerciseModalOpen) {
+      setId(modalCurrentExercise.id)
       setName(modalCurrentExercise.name)
       setNameIsEmpty(DEFAULT_NAME_IS_EMPTY)
       setCategory(modalCurrentExercise.category)
       setFrequency(modalCurrentExercise.frequency)
-      setTime(modalCurrentExercise.time)
+      setTime(modalCurrentExercise.time ? modalCurrentExercise.time : "")
     }
   }, [isExerciseModalOpen])
 
   return (
     <Dialog open={isExerciseModalOpen} onClose={onClose}>
-      <DialogTitle>Add Exercise</DialogTitle>
+      <DialogTitle>{modalTitle}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
