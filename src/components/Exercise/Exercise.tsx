@@ -8,20 +8,27 @@ import { IconContext } from 'react-icons'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export interface ExerciseProps {
+export interface ExerciseObj {
+  id?: string
   name: string
   category: string
   frequency: string
   time?: string
 }
 
-export default function Exercise({ name, time }: ExerciseProps) {
+interface ExerciseProps {
+  exercise: ExerciseObj
+  onEdit: (exercise: ExerciseObj) => void
+  onDelete: (exercise: ExerciseObj) => void
+}
+
+export default function Exercise({ exercise, onEdit, onDelete }: ExerciseProps) {
   const [isComplete, setIsComplete] = useState(false)
 
   function notifyOnExpire() {
     const notifTitle = "Time is up!"
     const options = {
-      body: `Congrats! You've completed the ${name} exercise!`,
+      body: `Congrats! You've completed ${exercise.name}!`,
       icon: "/favicon.ico",
       requireInterfaction: true,
       actions: [
@@ -42,14 +49,6 @@ export default function Exercise({ name, time }: ExerciseProps) {
     setIsComplete(!isComplete)
   }
 
-  function onEdit() {
-    alert("Edit")
-  }
-
-  function onDelete() {
-    alert("Delete")
-  }
-
   return (
     <div className={styles.card}>
       <div className={styles.cardTitle}>
@@ -58,20 +57,20 @@ export default function Exercise({ name, time }: ExerciseProps) {
             {isComplete ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
           </button>
         </IconContext.Provider>
-        <h2 className={classNames(inter.className, isComplete ? styles.crossOut : null)}>{name}</h2>
+        <h2 className={classNames(inter.className, isComplete ? styles.crossOut : null)}>{exercise.name}</h2>
         <IconContext.Provider value={{ size: "1.5rem" }}>
-          <button onClick={onEdit}>
+          <button onClick={() => onEdit(exercise)}>
             <MdEdit />
           </button>
         </IconContext.Provider>
         <IconContext.Provider value={{ size: "1.5rem" }}>
-          <button onClick={onDelete}>
+          <button onClick={() => onDelete(exercise)}>
             <MdClose />
           </button>
         </IconContext.Provider>
       </div>
-      {time ? (
-        <Timer time={time} notifyOnExpire={notifyOnExpire} />
+      {exercise.time ? (
+        <Timer time={exercise.time} notifyOnExpire={notifyOnExpire} />
       ) : null}
     </div>
   )

@@ -3,16 +3,13 @@ import { Inter } from '@next/font/google'
 import styles from '../styles/Home.module.css'
 import { MdAddBox } from 'react-icons/md'
 import { IconContext } from 'react-icons'
-import Exercise, { ExerciseProps } from '../components/Exercise/Exercise'
+import Exercise, { ExerciseObj } from '../components/Exercise/Exercise'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
-import { getFirestore, addDoc, collection, getDocs } from 'firebase/firestore'
+import { addDoc, collection, doc, deleteDoc, getDocs, getFirestore } from 'firebase/firestore'
 import ExerciseModal from '../components/ExerciseModal/ExerciseModal'
-import Snackbar from '@mui/material/Snackbar'
-import IconButton from '@mui/material/IconButton'
-import CloseIcon from '@mui/icons-material/Close'
-import Slide from '@mui/material/Slide'
+import CustomSnackbar from '../components/CusomSnackbar/CustomSnackbar'
 
 const inter = Inter({ subsets: ['latin'] })
 const darkTheme = createTheme({
@@ -35,14 +32,14 @@ export default function Home() {
   const analytics = app.name && typeof window !== 'undefined' ? getAnalytics(app) : null
   const db = getFirestore(app)
 
-  const NEW_EXERCISE: ExerciseProps = {
+  const NEW_EXERCISE: ExerciseObj = {
     name: "",
     category: "General",
     frequency: "Daily",
     time: ""
   }
 
-  const [exercises, setExercises] = useState<ExerciseProps[]>([])
+  const [exercises, setExercises] = useState<ExerciseObj[]>([])
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false)
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState("")
@@ -60,8 +57,11 @@ export default function Home() {
 
       try {
         const querySnapshot = await getDocs(collection(db, "exercises"))
-        const initialExercises: ExerciseProps[] = []
-        querySnapshot.forEach((doc) => initialExercises.push(doc.data() as ExerciseProps))
+        const initialExercises: ExerciseObj[] = []
+        querySnapshot.forEach((doc) => initialExercises.push({
+          id: doc.id,
+          ...doc.data()
+        } as ExerciseObj))
         setExercises(initialExercises)
       } catch (e) {
         alert("Error retrieving exercises: " + e)
@@ -69,9 +69,9 @@ export default function Home() {
     })()
   }, [])
 
-  function openSnackbar(exercise: ExerciseProps) {
+  function openSnackbar(message: string) {
     setIsSnackbarOpen(true)
-    setSnackbarMessage("Added exercise " + exercise.name)
+    setSnackbarMessage(message)
   }
 
   function onSnackbarClose(event: React.SyntheticEvent | Event, reason?: string) {
@@ -81,26 +81,31 @@ export default function Home() {
     setIsSnackbarOpen(false)
   }
 
-  const snackbarAction = (
-    <>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={onSnackbarClose}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </>
-  )
-
-  async function onAddExercise(exercise: ExerciseProps) {
+  async function onAddExercise(exercise: ExerciseObj) {
     try {
       await addDoc(collection(db, "exercises"), exercise);
       setExercises([...exercises, exercise])
-      openSnackbar(exercise)
+      openSnackbar("Added exercise " + exercise.name)
     } catch (e) {
-      alert("Error adding exercise: " + e)
+      openSnackbar("Error adding exercise: " + e)
+    }
+  }
+
+  async function onEditExercise(exercise: ExerciseObj) {
+    openSnackbar("Editing exercise not implemented yet")
+  }
+
+  async function onDeleteExercise(exercise: ExerciseObj) {
+    if (exercise.id) {
+      try {
+        await deleteDoc(doc(db, "exercises", exercise.id))
+        setExercises(exercises.filter((ex) => ex.id != exercise.id))
+        openSnackbar("Deleted exercise " + exercise.name)
+      } catch (e) {
+        openSnackbar("Error deleting exercise: " + e)
+      }
+    } else {
+      openSnackbar(`Failed to delete exercise ${exercise.name}: id is undefined`)
     }
   }
 
@@ -116,7 +121,12 @@ export default function Home() {
         </div>
         <div className={styles.grid}>
           {exercises.map((exercise, i) => (
-            <Exercise {...exercise} key={`exercise-${i}`} />
+            <Exercise
+              exercise={exercise}
+              onEdit={onEditExercise}
+              onDelete={onDeleteExercise}
+              key={`exercise-${i}`}
+            />
           ))}
           <IconContext.Provider value={{ size: "3rem" }}>
             <button onClick={() => setIsExerciseModalOpen(true)}>
@@ -131,14 +141,10 @@ export default function Home() {
           modalCurrentExercise={modalCurrentExercise}
           onSave={onAddExercise}
         />
-        <Snackbar
-          open={isSnackbarOpen}
-          autoHideDuration={3000}
-          onClose={onSnackbarClose}
-          TransitionComponent={(props) => <Slide {...props} direction="up" />}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          action={snackbarAction}
-          message={snackbarMessage}
+        <CustomSnackbar
+          isSnackbarOpen={isSnackbarOpen}
+          onSnackbarClose={onSnackbarClose}
+          snackbarMessage={snackbarMessage}
         />
       </main>
     </ThemeProvider>

@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import styles from './ExerciseModal.module.css'
-import { ExerciseProps } from '../Exercise/Exercise'
+import { ExerciseObj } from '../Exercise/Exercise'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Dialog from '@mui/material/Dialog'
@@ -11,8 +11,8 @@ import DialogTitle from '@mui/material/DialogTitle'
 interface ExerciseModalProps {
   isExerciseModalOpen: boolean
   setIsExerciseModalOpen: Dispatch<SetStateAction<boolean>>
-  modalCurrentExercise: ExerciseProps
-  onSave: (exercise: ExerciseProps) => void
+  modalCurrentExercise: ExerciseObj
+  onSave: (exercise: ExerciseObj) => void
 }
 
 export default function ExerciseModal({
@@ -46,7 +46,7 @@ export default function ExerciseModal({
     } else if (!isTimeValid(time)) {
       alert("Time not valid")
     } else {
-      const exercise: ExerciseProps = {
+      const exercise: ExerciseObj = {
         name: name,
         category: category,
         frequency: frequency,
